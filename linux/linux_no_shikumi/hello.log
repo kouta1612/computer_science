@@ -1,37 +1,37 @@
-execve("./hello", ["./hello"], 0x7fffa326c630 /* 5 vars */) = 0
+execve("./hello", ["./hello"], 0x7ffd9107db20 /* 5 vars */) = 0
 arch_prctl(ARCH_SET_FS, 0x55e0f0)       = 0
 sched_getaffinity(0, 8192, [0, 1, 2, 3]) = 16
 openat(AT_FDCWD, "/sys/kernel/mm/transparent_hugepage/hpage_pmd_size", O_RDONLY) = 3
 read(3, "2097152\n", 20)                = 8
 close(3)                                = 0
-mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1afe0b0000
+mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0f2d3bd000
 mmap(0xc000000000, 67108864, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0xc000000000
 mmap(0xc000000000, 67108864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0xc000000000
-mmap(NULL, 33554432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1afc0b0000
-mmap(NULL, 2164736, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1afbe9f000
-mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1afbe8f000
-mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1afbe7f000
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=138046371}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=139483471}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=141012271}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=142523371}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=144704271}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=146333071}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=147721371}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=149222671}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=150683671}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=152620771}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=154106771}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=155863171}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=157599671}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=159270571}) = 0
+mmap(NULL, 33554432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0f2b3bd000
+mmap(NULL, 2164736, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0f2b1ac000
+mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0f2b19c000
+mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0f2b18c000
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=635528071}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=636976571}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=638224871}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=639656571}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=641015171}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=642559971}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=643793071}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=645158971}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=646565671}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=647846971}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=649083171}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=650520871}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=652088271}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=653643271}) = 0
 rt_sigprocmask(SIG_SETMASK, NULL, [], 8) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=162487071}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=163851671}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=656494871}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=657788971}) = 0
 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
 sigaltstack({ss_sp=0xc000002000, ss_flags=0, ss_size=32768}, NULL) = 0
 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
-gettid()                                = 285
+gettid()                                = 190
 rt_sigaction(SIGHUP, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
 rt_sigaction(SIGHUP, {sa_handler=0x4551e0, sa_mask=~[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x455310}, NULL, 8) = 0
 rt_sigaction(SIGINT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
@@ -147,21 +147,21 @@ rt_sigaction(SIGRT_31, {sa_handler=0x4551e0, sa_mask=~[], sa_flags=SA_RESTORER|S
 rt_sigaction(SIGRT_32, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
 rt_sigaction(SIGRT_32, {sa_handler=0x4551e0, sa_mask=~[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x455310}, NULL, 8) = 0
 rt_sigprocmask(SIG_SETMASK, ~[], [], 8) = 0
-clone(child_stack=0xc000040000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM) = 286
+clone(child_stack=0xc000040000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM) = 191
 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
 rt_sigprocmask(SIG_SETMASK, ~[], [], 8) = 0
-clone(child_stack=0xc000042000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM) = 287
+clone(child_stack=0xc000042000, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM) = 192
 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
 futex(0xc0000304c8, FUTEX_WAKE_PRIVATE, 1) = 1
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=378612771}) = 0
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=380209471}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=820251571}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=821620771}) = 0
 futex(0xc00004a148, FUTEX_WAKE_PRIVATE, 1) = 1
 futex(0xc0000304c8, FUTEX_WAKE_PRIVATE, 1) = 1
-clock_gettime(CLOCK_MONOTONIC, {tv_sec=49142, tv_nsec=386106571}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=77920, tv_nsec=825661471}) = 0
 readlinkat(AT_FDCWD, "/proc/self/exe", "/app/hello", 128) = 10
 fcntl(0, F_GETFL)                       = 0x8002 (flags O_RDWR|O_LARGEFILE)
 futex(0xc00004a148, FUTEX_WAKE_PRIVATE, 1) = 1
-mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1afbe3f000
+mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0f2b14c000
 futex(0xc0000304c8, FUTEX_WAKE_PRIVATE, 1) = 1
 fcntl(1, F_GETFL)                       = 0x8002 (flags O_RDWR|O_LARGEFILE)
 fcntl(2, F_GETFL)                       = 0x8002 (flags O_RDWR|O_LARGEFILE)

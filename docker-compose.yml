@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: ./linux/linux_no_shikumi
+      dockerfile: Dockerfile
+    container_name: linux_no_shikumi
+    tty: true
+    volumes:
+      - ./linux/linux_no_shikumi:/app
