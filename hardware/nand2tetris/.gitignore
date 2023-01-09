@@ -1,3 +1,4 @@
 tools/bin/*.dat
 projects/**/*.out
+projects/**/*.hack
 .DS_Store
