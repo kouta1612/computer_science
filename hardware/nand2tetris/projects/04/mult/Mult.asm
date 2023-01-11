@@ -10,11 +10,11 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
-@0
+@R0
 D=M // D = R0
 @i
 M=D // i = D
-@1
+@R1
 D=M // D = R1
 @j
 M=D // j = D
@@ -36,7 +36,7 @@ M=M-1 // i--
 (END)
 @mul
 D=M // D = mul
-@2
+@R2
 M=D // R2 = D
 @END
 0;JMP // goto END (infinite)
