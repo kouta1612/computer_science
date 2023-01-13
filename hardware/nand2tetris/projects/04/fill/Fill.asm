@@ -12,3 +12,4 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
+// スクリーン: RAM[16384] ~ RAM[24575]
