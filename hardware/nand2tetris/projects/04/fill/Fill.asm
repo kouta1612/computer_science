@@ -16,15 +16,36 @@
     D=A
     @pixel_num
     M=D
+    @STATE_CHECK
+    0;JMP
+(STATE_CHECK)
+    @KBD
+    D=M
+    @BLACK
+    D;JNE
+    @WHITE
+    0;JMP
+(BLACK)
     @i
     M=0
-(LOOP)
+    @BLACK_LOOP
+    0;JMP
+(BLACK_LOOP)
+    // キーボードが押下されたかどうか確認
+    @KBD
+    D=M
+    @STATE_CHECK
+    D;JEQ
+    // ピクセル数以上ループしたらはじめに戻る
     @i
     D=M
     @pixel_num
-    D=D-M
-    @END
+    D=M-D
+    @1
+    D=D-A
+    @STATE_CHECK
     D;JEQ
+    // ループ内でスクリーンを8ビットずつ黒く塗りつぶす
     @i
     D=M
     @SCREEN
@@ -32,8 +53,35 @@
     M=-1
     @i
     M=M+1
-    @LOOP
+    @BLACK_LOOP
     0;JMP
-(END)
-    @END
+(WHITE)
+    @i
+    M=0
+    @WHITE_LOOP
+    0;JMP
+(WHITE_LOOP)
+    // キーボードが押下されていないかどうか確認
+    @KBD
+    D=M
+    @STATE_CHECK
+    D;JNE
+    // ピクセル数以上ループしたらはじめに戻る
+    @i
+    D=M
+    @pixel_num
+    D=M-D
+    @1
+    D=D-A
+    @STATE_CHECK
+    D;JEQ
+    // ループ内でスクリーンを8ビットずつ白く塗りつぶす
+    @i
+    D=M
+    @SCREEN
+    A=A+D
+    M=0
+    @i
+    M=M+1
+    @WHITE_LOOP
     0;JMP
