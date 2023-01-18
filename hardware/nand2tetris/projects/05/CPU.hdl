@@ -44,10 +44,31 @@ CHIP CPU {
     // (i: instruction[15], a: instruction[12], cccccc: instruction[6..11], ddd: instruction[3..5], jjj: instruction[0..2])
 
     // 命令メモリかデータメモリのどちらかを出力
-    Mux16(a=instruction, b=alu_out, sel=instruction[15], out=a_register_in);
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=aRegisterIn);
     // Aレジスタに入力を読み込ませるか
-    Not(in=instruction[15], out=not_instruction_15);
-    Or(a=not_instruction_15, b=instruction[5], out=a_load);
+    Not(in=instruction[15], out=notInstruction15);
+    Or(a=notInstruction15, b=instruction[5], out=aLoad);
     // Aレジスタ処理
-    ARegister(in=a_register_in, load=a_load, out=a_register_out);
+    ARegister(in=aRegisterIn, load=aLoad, out=aRegisterOut);
+
+    // ALUの入力データは「Dレジスタ値」と「Aレジスタ or メモリ入力」から構成される
+    // instruction[12]=0 のときはAレジスタ、instruction[12]=1 のときはメモリ入力
+    Mux16(a=aRegisterOut, b=inM, sel=instruction[12], out=aluIn);
+    DRegister(in=aluOut, load=instruction[4], out=dRegisterOut);
+    ALU(x=dRegisterOut, y=aluIn, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outM, out=aluOut, zr=zr, ng=ng);
+
+    // ALUと命令のjビットからpcLoadを算出し、PC回路に入力
+    Or(a=zr, b=ng, out=tmp0);
+    Not(in=tmp0, out=pl);
+    And(a=instruction[2], b=ng, out=j2);
+    And(a=instruction[1], b=zr, out=j1);
+    And(a=instruction[0], b=pl, out=j0);
+    Or(a=j2, b=j1, out=tmp1);
+    Or(a=tmp1, b=j0, out=tmp2);
+    And(a=tmp2, b=instruction[15], out=pcLoad);
+    PC(in=aRegisterOut, load=pcLoad, inc=true, reset=reset, out[0..14]=pc);
+
+    // 残りの出力を算出
+    And(a=instruction[15], b=instruction[3], out=writeM);
+    And16(a=true, b=aRegisterOut, out[0..14]=addressM);
 }
