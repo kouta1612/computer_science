@@ -54,7 +54,8 @@ CHIP CPU {
     // ALUの入力データは「Dレジスタ値」と「Aレジスタ or メモリ入力」から構成される
     // instruction[12]=0 のときはAレジスタ、instruction[12]=1 のときはメモリ入力
     Mux16(a=aRegisterOut, b=inM, sel=instruction[12], out=aluIn);
-    DRegister(in=aluOut, load=instruction[4], out=dRegisterOut);
+    And(a=instruction[4], b=instruction[15], out=dLoad);
+    DRegister(in=aluOut, load=dLoad, out=dRegisterOut);
     ALU(x=dRegisterOut, y=aluIn, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outM, out=aluOut, zr=zr, ng=ng);
 
     // ALUと命令のjビットからpcLoadを算出し、PC回路に入力
