@@ -40,4 +40,14 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+    // decode(instruction[16]: ixxaccccccdddjjj)
+    // (i: instruction[15], a: instruction[12], cccccc: instruction[6..11], ddd: instruction[3..5], jjj: instruction[0..2])
+
+    // 命令メモリかデータメモリのどちらかを出力
+    Mux16(a=instruction, b=alu_out, sel=instruction[15], out=a_register_in);
+    // Aレジスタに入力を読み込ませるか
+    Not(in=instruction[15], out=not_instruction_15);
+    Or(a=not_instruction_15, b=instruction[5], out=a_load);
+    // Aレジスタ処理
+    ARegister(in=a_register_in, load=a_load, out=a_register_out);
 }
