@@ -14,7 +14,7 @@ class Parser {
 
     private static final Pattern A_COMMAND_PATTERN = Pattern.compile("@([a-zA-Z0-9_.$:]+)");
     private static final Pattern L_COMMAND_PATTERN = Pattern.compile("\\(([a-zA-Z0-9_.$:]+)\\)");
-    private static final Pattern C_COMMAND_PATTERN = Pattern.compile("(?:(M?D?A?)=)?([^;]+)(?:;(.+))?");
+    private static final Pattern C_COMMAND_PATTERN = Pattern.compile("(?:(A?M?D?)=)?([^;]+)(?:;(.+))?"); // AM=M-1
 
     Parser(String filename) throws IOException {
         File file = new File(filename);
@@ -26,22 +26,22 @@ class Parser {
         currentCommand = null;
     }
 
-    public void advance() throws IOException {
+    public boolean advance() throws IOException {
         try {
             currentCommand = reader.readLine();
             if (currentCommand == null) {
-                return;
+                reader.close();
+                return false;
             }
 
             currentCommand = currentCommand.replaceAll(" ", "");
             currentCommand = currentCommand.replaceAll("//.*$", "");
+
+            return true;
         } catch (IOException io) {
+            reader.close();
             throw new IOException("読み取り時にエラーが発生しました。");
         }
-    }
-
-    public String getCommand() {
-        return currentCommand;
     }
 
     public String commandType() {
@@ -49,6 +49,8 @@ class Parser {
             return "A_COMMAND";
         } else if (currentCommand.indexOf("(") == 0) {
             return "L_COMMAND";
+        } else if (currentCommand.equals("")) {
+            return "EMPTY";
         } else {
             return "C_COMMAND";
         }
@@ -75,20 +77,6 @@ class Parser {
         }
     }
 
-    public String dest() throws Exception {
-        switch (commandType()) {
-            case "C_COMMAND":
-                Matcher matcher = C_COMMAND_PATTERN.matcher(currentCommand);
-                if (!matcher.matches()) {
-                    return null;
-                }
-
-                return matcher.group(1);
-            default:
-                throw new Exception("C_COMMAND以外は受け付けていません。");
-        }
-    }
-
     public String comp() throws Exception {
         switch (commandType()) {
             case "C_COMMAND":
@@ -98,6 +86,20 @@ class Parser {
                 }
 
                 return matcher.group(2);
+            default:
+                throw new Exception("C_COMMAND以外は受け付けていません。");
+        }
+    }
+
+    public String dest() throws Exception {
+        switch (commandType()) {
+            case "C_COMMAND":
+                Matcher matcher = C_COMMAND_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    return null;
+                }
+
+                return matcher.group(1);
             default:
                 throw new Exception("C_COMMAND以外は受け付けていません。");
         }
