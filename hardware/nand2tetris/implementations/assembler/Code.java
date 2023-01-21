@@ -68,8 +68,6 @@ public class Code {
             return COMP_MAP.get("0");
         }
 
-        System.out.println(mnemonic);
-
         return COMP_MAP.get(mnemonic);
     }
 
