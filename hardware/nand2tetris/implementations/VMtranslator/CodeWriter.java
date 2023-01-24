@@ -24,97 +24,68 @@ public class CodeWriter {
             // スタックポインタを更新
             decrementSP();
             // 演算を実行
-            bufferedWriter.write("A=M");
-            bufferedWriter.newLine();
+            codeWrites("A=M");
             if (command.equals("neg")) {
-                bufferedWriter.write("M=-M");
+                codeWrites("M=-M");
             }
             if (command.equals("not")) {
-                bufferedWriter.write("M=!M");
+                codeWrites("M=!M");
             }
-            bufferedWriter.newLine();
         }
         if (CALC_COMMAND_PATTERN.matcher(command).matches()) {
             // スタックポインタを更新
             decrementSP();
             // Dレジスタにスタックを代入
-            bufferedWriter.write("A=M");
-            bufferedWriter.newLine();
-            bufferedWriter.write("D=M");
-            bufferedWriter.newLine();
+            codeWrites("A=M", "D=M");
             // スタックポインタを更新
             decrementSP();
 
             // 演算を実行
-            bufferedWriter.write("A=M");
-            bufferedWriter.newLine();
+            codeWrites("A=M");
             if (command.equals("add")) {
-                bufferedWriter.write("M=M+D");
+                codeWrites("M=M+D");
             }
             if (command.equals("sub")) {
-                bufferedWriter.write("M=M-D");
+                codeWrites("M=M-D");
             }
             if (command.equals("and")) {
-                bufferedWriter.write("M=M&D");
+                codeWrites("M=M&D");
             }
             if (command.equals("or")) {
-                bufferedWriter.write("M=M|D");
+                codeWrites("M=M|D");
             }
-            bufferedWriter.newLine();
         }
 
         if (BOOL_COMMAND_PATTERN.matcher(command).matches()) {
             // スタックポインタを更新
             decrementSP();
             // Dレジスタにスタックを代入
-            bufferedWriter.write("A=M");
-            bufferedWriter.newLine();
-            bufferedWriter.write("D=M");
-            bufferedWriter.newLine();
+            codeWrites("A=M", "D=M");
             // スタックポインタを更新
             decrementSP();
 
             // 演算を実行
-            bufferedWriter.write("A=M");
-            bufferedWriter.newLine();
-            bufferedWriter.write("D=M-D");
-            bufferedWriter.newLine();
+            codeWrites("A=M", "D=M-D");
             String trueLabel = getLabel();
             String falseLabel = getLabel();
             // 条件によって遷移先に移動
-            bufferedWriter.write("@" + trueLabel);
-            bufferedWriter.newLine();
+            codeWrites("@" + trueLabel);
             if (command.equals("eq")) {
-                bufferedWriter.write("D;JEQ");
+                codeWrites("D;JEQ");
             }
             if (command.equals("lt")) {
-                bufferedWriter.write("D;JLT");
+                codeWrites("D;JLT");
             }
             if (command.equals("gt")) {
-                bufferedWriter.write("D;JGT");
+                codeWrites("D;JGT");
             }
-            bufferedWriter.newLine();
-            bufferedWriter.write("D=0");
-            bufferedWriter.newLine();
-            bufferedWriter.write("@" + falseLabel);
-            bufferedWriter.newLine();
-            bufferedWriter.write("0;JMP");
-            bufferedWriter.newLine();
+            codeWrites("D=0", "@" + falseLabel, "0;JMP");
             // 条件がTrueだった場合の遷移先
-            bufferedWriter.write("(" + trueLabel + ")");
-            bufferedWriter.newLine();
-            bufferedWriter.write("D=-1");
-            bufferedWriter.newLine();
+            codeWrites("(" + trueLabel + ")", "D=-1");
             // 条件がFalseだった場合の遷移先
-            bufferedWriter.write("(" + falseLabel + ")");
-            bufferedWriter.newLine();
+            codeWrites("(" + falseLabel + ")");
             // スタックポインタが指すアドレスのデータを更新
-            bufferedWriter.write("@SP");
-            bufferedWriter.newLine();
-            bufferedWriter.write("A=M");
-            bufferedWriter.newLine();
-            bufferedWriter.write("M=D");
-            bufferedWriter.newLine();
+            codeWrites("@SP", "A=M", "M=D");
         }
 
         // スタックポインタを更新
@@ -125,17 +96,9 @@ public class CodeWriter {
         if (commandType.equals("C_PUSH")) {
             if (segment.equals("constant")) {
                 // 定数をDレジスタに代入
-                bufferedWriter.write("@" + index);
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=A");
-                bufferedWriter.newLine();
+                codeWrites("@" + index, "D=A");
                 // Dレジスタ値をスタックに代入
-                bufferedWriter.write("@SP");
-                bufferedWriter.newLine();
-                bufferedWriter.write("A=M");
-                bufferedWriter.newLine();
-                bufferedWriter.write("M=D");
-                bufferedWriter.newLine();
+                codeWrites("@SP", "A=M", "M=D");
                 // スタックポインタを更新
                 incrementSP();
             }
@@ -146,18 +109,19 @@ public class CodeWriter {
         bufferedWriter.close();
     }
 
+    private void codeWrites(String... codes) throws IOException {
+        for (String code : codes) {
+            bufferedWriter.write(code);
+            bufferedWriter.newLine();
+        }
+    }
+
     private void incrementSP() throws IOException {
-        bufferedWriter.write("@SP");
-        bufferedWriter.newLine();
-        bufferedWriter.write("M=M+1");
-        bufferedWriter.newLine();
+        codeWrites("@SP", "M=M+1");
     }
 
     private void decrementSP() throws IOException {
-        bufferedWriter.write("@SP");
-        bufferedWriter.newLine();
-        bufferedWriter.write("M=M-1");
-        bufferedWriter.newLine();
+        codeWrites("@SP", "M=M-1");
     }
 
     private String getLabel() throws IOException {
