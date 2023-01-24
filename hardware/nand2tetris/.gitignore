@@ -1,4 +1,5 @@
 tools/bin/*.dat
 projects/**/*.out
 projects/**/*.hack
+projects/07/**/*.asm
 .DS_Store

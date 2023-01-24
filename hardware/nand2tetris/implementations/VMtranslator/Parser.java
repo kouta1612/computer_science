@@ -5,20 +5,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
     private BufferedReader bufferedReader;
-    private String currentCommand;
+    public String currentCommand;
+    private String currentCommandType;
 
     private static final Pattern ARITHMETIC_PATTERN = Pattern.compile("^(add|sub|neg|eq|gt|lt|and|or|not)$");
     private static final Pattern PUSH_PATTERN = Pattern
-            .compile("^push(argument|local|static|constant|this|that|pointer|temp)(\\d)");
-    private static final Pattern POP_PATTERN = Pattern
-            .compile("^pop(argument|local|static|constant|this|that|pointer|temp)(\\d)");
+            .compile("push(argument|local|static|constant|this|that|pointer|temp)(\\d+)");
+    // private static final Pattern POP_PATTERN = Pattern
+    // .compile("^pop(argument|local|static|constant|this|that|pointer|temp)(\\d+)");
 
-    Parser(String fileName) throws FileNotFoundException {
-        File file = new File(fileName);
+    Parser(File file) throws FileNotFoundException {
         FileReader fileReader = new FileReader(file);
         bufferedReader = new BufferedReader(fileReader);
     }
@@ -42,41 +43,59 @@ public class Parser {
     }
 
     public String commandType() throws Exception {
+        if (currentCommand.equals("")) {
+            currentCommandType = "EMPTY";
+            return currentCommandType;
+        }
         if (ARITHMETIC_PATTERN.matcher(currentCommand).matches()) {
-            return "C_ARITHMETIC";
+            currentCommandType = "C_ARITHMETIC";
+            return currentCommandType;
         }
         if (PUSH_PATTERN.matcher(currentCommand).matches()) {
-
-            return "C_PUSH";
+            currentCommandType = "C_PUSH";
+            return currentCommandType;
         }
-        if (POP_PATTERN.matcher(currentCommand).matches()) {
-            return "C_POP";
-        }
+        // if (POP_PATTERN.matcher(currentCommand).matches()) {
+        // currentCommandType = "C_POP";
+        // return currentCommandType;
+        // }
 
         throw new Exception("予期しないコマンドタイプが設定されています。");
     }
 
     public String arg1() throws Exception {
-        switch (commandType()) {
+        switch (currentCommandType) {
             case "C_ARITHMETIC":
-                return currentCommand;
+                Matcher matcher = ARITHMETIC_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("算術コマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
             case "C_PUSH":
-                return PUSH_PATTERN.matcher(currentCommand).group(1);
-            case "C_POP":
-                return POP_PATTERN.matcher(currentCommand).group(1);
-            case "C_RETURN":
-                throw new IllegalArgumentException("C_RETURN は引数を持ちません。");
+                matcher = PUSH_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("PUSHコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
+            // case "C_POP":
+            // return POP_PATTERN.matcher(currentCommand).group(1);
+            // case "C_RETURN":
+            // throw new IllegalArgumentException("C_RETURN は引数を持ちません。");
             default:
                 throw new Exception("予期しない引数です。");
         }
     }
 
-    public String arg2() throws Exception {
-        switch (commandType()) {
+    public int arg2() throws Exception {
+        switch (currentCommandType) {
             case "C_PUSH":
-                return PUSH_PATTERN.matcher(currentCommand).group(2);
-            case "C_POP":
-                return PUSH_PATTERN.matcher(currentCommand).group(2);
+                Matcher matcher = PUSH_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("PUSHコマンドでパースエラーが発生しました。");
+                }
+                return Integer.valueOf(matcher.group(2));
+            // case "C_POP":
+            // return Integer.valueOf(PUSH_PATTERN.matcher(currentCommand).group(2), 0);
             default:
                 throw new Exception("引数を持たないか予期しないコマンドです。");
         }
