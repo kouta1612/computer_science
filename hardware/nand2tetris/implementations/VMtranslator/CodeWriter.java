@@ -21,10 +21,7 @@ public class CodeWriter {
     public void writeArithmetic(String command) throws IOException {
         if (ONE_ARGUMENT_COMMAND_PATTERN.matcher(command).matches()) {
             // スタックポインタを更新
-            bufferedWriter.write("@SP");
-            bufferedWriter.newLine();
-            bufferedWriter.write("M=M-1");
-            bufferedWriter.newLine();
+            decrementSP();
             // 演算を実行
             if (command.equals("neg")) {
                 bufferedWriter.write("A=M");
@@ -41,20 +38,14 @@ public class CodeWriter {
         }
         if (TWO_ARGUMENT_COMMAND_PATTERN.matcher(command).matches()) {
             // スタックポインタを更新
-            bufferedWriter.write("@SP");
-            bufferedWriter.newLine();
-            bufferedWriter.write("M=M-1");
-            bufferedWriter.newLine();
+            decrementSP();
             // Dレジスタにスタックを代入
             bufferedWriter.write("A=M");
             bufferedWriter.newLine();
             bufferedWriter.write("D=M");
             bufferedWriter.newLine();
             // スタックポインタを更新
-            bufferedWriter.write("@SP");
-            bufferedWriter.newLine();
-            bufferedWriter.write("M=M-1");
-            bufferedWriter.newLine();
+            decrementSP();
 
             // 演算を実行
             bufferedWriter.write("A=M");
@@ -174,10 +165,7 @@ public class CodeWriter {
         }
 
         // スタックポインタを更新
-        bufferedWriter.write("@SP");
-        bufferedWriter.newLine();
-        bufferedWriter.write("M=M+1");
-        bufferedWriter.newLine();
+        incrementSP();
     }
 
     public void writePushPop(String commandType, String segment, int index) throws IOException {
@@ -196,16 +184,27 @@ public class CodeWriter {
                 bufferedWriter.write("M=D");
                 bufferedWriter.newLine();
                 // スタックポインタを更新
-                bufferedWriter.write("@SP");
-                bufferedWriter.newLine();
-                bufferedWriter.write("M=M+1");
-                bufferedWriter.newLine();
+                incrementSP();
             }
         }
     }
 
     public void close() throws IOException {
         bufferedWriter.close();
+    }
+
+    private void incrementSP() throws IOException {
+        bufferedWriter.write("@SP");
+        bufferedWriter.newLine();
+        bufferedWriter.write("M=M+1");
+        bufferedWriter.newLine();
+    }
+
+    private void decrementSP() throws IOException {
+        bufferedWriter.write("@SP");
+        bufferedWriter.newLine();
+        bufferedWriter.write("M=M-1");
+        bufferedWriter.newLine();
     }
 
     private String getLabel() throws IOException {
