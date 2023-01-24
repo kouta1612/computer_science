@@ -10,8 +10,9 @@ public class CodeWriter {
     private static BufferedWriter bufferedWriter;
     private static int labelNumber = 0;
 
-    private static final Pattern ONE_ARGUMENT_COMMAND_PATTERN = Pattern.compile("^(neg|not)$");
-    private static final Pattern TWO_ARGUMENT_COMMAND_PATTERN = Pattern.compile("^(add|sub|eq|gt|lt|and|or)$");
+    private static final Pattern NEGA_COMMAND_PATTERN = Pattern.compile("^(neg|not)$");
+    private static final Pattern CALC_COMMAND_PATTERN = Pattern.compile("^(add|sub|and|or)$");
+    private static final Pattern BOOL_COMMAND_PATTERN = Pattern.compile("^(eq|gt|lt)$");
 
     CodeWriter(File file) throws IOException {
         FileWriter fileWriter = new FileWriter(file);
@@ -19,24 +20,21 @@ public class CodeWriter {
     }
 
     public void writeArithmetic(String command) throws IOException {
-        if (ONE_ARGUMENT_COMMAND_PATTERN.matcher(command).matches()) {
+        if (NEGA_COMMAND_PATTERN.matcher(command).matches()) {
             // スタックポインタを更新
             decrementSP();
             // 演算を実行
+            bufferedWriter.write("A=M");
+            bufferedWriter.newLine();
             if (command.equals("neg")) {
-                bufferedWriter.write("A=M");
-                bufferedWriter.newLine();
                 bufferedWriter.write("M=-M");
-                bufferedWriter.newLine();
             }
             if (command.equals("not")) {
-                bufferedWriter.write("A=M");
-                bufferedWriter.newLine();
                 bufferedWriter.write("M=!M");
-                bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
         }
-        if (TWO_ARGUMENT_COMMAND_PATTERN.matcher(command).matches()) {
+        if (CALC_COMMAND_PATTERN.matcher(command).matches()) {
             // スタックポインタを更新
             decrementSP();
             // Dレジスタにスタックを代入
@@ -52,116 +50,71 @@ public class CodeWriter {
             bufferedWriter.newLine();
             if (command.equals("add")) {
                 bufferedWriter.write("M=M+D");
-                bufferedWriter.newLine();
             }
             if (command.equals("sub")) {
                 bufferedWriter.write("M=M-D");
-                bufferedWriter.newLine();
             }
             if (command.equals("and")) {
                 bufferedWriter.write("M=M&D");
-                bufferedWriter.newLine();
             }
             if (command.equals("or")) {
                 bufferedWriter.write("M=M|D");
-                bufferedWriter.newLine();
             }
+            bufferedWriter.newLine();
+        }
+
+        if (BOOL_COMMAND_PATTERN.matcher(command).matches()) {
+            // スタックポインタを更新
+            decrementSP();
+            // Dレジスタにスタックを代入
+            bufferedWriter.write("A=M");
+            bufferedWriter.newLine();
+            bufferedWriter.write("D=M");
+            bufferedWriter.newLine();
+            // スタックポインタを更新
+            decrementSP();
+
+            // 演算を実行
+            bufferedWriter.write("A=M");
+            bufferedWriter.newLine();
+            bufferedWriter.write("D=M-D");
+            bufferedWriter.newLine();
+            String trueLabel = getLabel();
+            String falseLabel = getLabel();
+            // 条件によって遷移先に移動
+            bufferedWriter.write("@" + trueLabel);
+            bufferedWriter.newLine();
             if (command.equals("eq")) {
-                bufferedWriter.write("D=M-D");
-                bufferedWriter.newLine();
-                String trueLabel = getLabel();
-                String falseLabel = getLabel();
-                // 条件によって遷移先に移動
-                bufferedWriter.write("@" + trueLabel);
-                bufferedWriter.newLine();
                 bufferedWriter.write("D;JEQ");
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=0");
-                bufferedWriter.newLine();
-                bufferedWriter.write("@" + falseLabel);
-                bufferedWriter.newLine();
-                bufferedWriter.write("0;JMP");
-                bufferedWriter.newLine();
-                // 条件がTrueだった場合の遷移先
-                bufferedWriter.write("(" + trueLabel + ")");
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=-1");
-                bufferedWriter.newLine();
-                // 条件がFalseだった場合の遷移先
-                bufferedWriter.write("(" + falseLabel + ")");
-                bufferedWriter.newLine();
-                // スタックポインタが指すアドレスのデータを更新
-                bufferedWriter.write("@SP");
-                bufferedWriter.newLine();
-                bufferedWriter.write("A=M");
-                bufferedWriter.newLine();
-                bufferedWriter.write("M=D");
-                bufferedWriter.newLine();
-            }
-            if (command.equals("gt")) {
-                bufferedWriter.write("D=M-D");
-                bufferedWriter.newLine();
-                String trueLabel = getLabel();
-                String falseLabel = getLabel();
-                // 条件によって遷移先に移動
-                bufferedWriter.write("@" + trueLabel);
-                bufferedWriter.newLine();
-                bufferedWriter.write("D;JGT");
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=0");
-                bufferedWriter.newLine();
-                bufferedWriter.write("@" + falseLabel);
-                bufferedWriter.newLine();
-                bufferedWriter.write("0;JMP");
-                bufferedWriter.newLine();
-                // 条件がTrueだった場合の遷移先
-                bufferedWriter.write("(" + trueLabel + ")");
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=-1");
-                bufferedWriter.newLine();
-                // 条件がFalseだった場合の遷移先
-                bufferedWriter.write("(" + falseLabel + ")");
-                bufferedWriter.newLine();
-                // スタックポインタが指すアドレスのデータを更新
-                bufferedWriter.write("@SP");
-                bufferedWriter.newLine();
-                bufferedWriter.write("A=M");
-                bufferedWriter.newLine();
-                bufferedWriter.write("M=D");
-                bufferedWriter.newLine();
             }
             if (command.equals("lt")) {
-                bufferedWriter.write("D=M-D");
-                bufferedWriter.newLine();
-                String trueLabel = getLabel();
-                String falseLabel = getLabel();
-                // 条件によって遷移先に移動
-                bufferedWriter.write("@" + trueLabel);
-                bufferedWriter.newLine();
                 bufferedWriter.write("D;JLT");
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=0");
-                bufferedWriter.newLine();
-                bufferedWriter.write("@" + falseLabel);
-                bufferedWriter.newLine();
-                bufferedWriter.write("0;JMP");
-                bufferedWriter.newLine();
-                // 条件がTrueだった場合の遷移先
-                bufferedWriter.write("(" + trueLabel + ")");
-                bufferedWriter.newLine();
-                bufferedWriter.write("D=-1");
-                bufferedWriter.newLine();
-                // 条件がFalseだった場合の遷移先
-                bufferedWriter.write("(" + falseLabel + ")");
-                bufferedWriter.newLine();
-                // スタックポインタが指すアドレスのデータを更新
-                bufferedWriter.write("@SP");
-                bufferedWriter.newLine();
-                bufferedWriter.write("A=M");
-                bufferedWriter.newLine();
-                bufferedWriter.write("M=D");
-                bufferedWriter.newLine();
             }
+            if (command.equals("gt")) {
+                bufferedWriter.write("D;JGT");
+            }
+            bufferedWriter.newLine();
+            bufferedWriter.write("D=0");
+            bufferedWriter.newLine();
+            bufferedWriter.write("@" + falseLabel);
+            bufferedWriter.newLine();
+            bufferedWriter.write("0;JMP");
+            bufferedWriter.newLine();
+            // 条件がTrueだった場合の遷移先
+            bufferedWriter.write("(" + trueLabel + ")");
+            bufferedWriter.newLine();
+            bufferedWriter.write("D=-1");
+            bufferedWriter.newLine();
+            // 条件がFalseだった場合の遷移先
+            bufferedWriter.write("(" + falseLabel + ")");
+            bufferedWriter.newLine();
+            // スタックポインタが指すアドレスのデータを更新
+            bufferedWriter.write("@SP");
+            bufferedWriter.newLine();
+            bufferedWriter.write("A=M");
+            bufferedWriter.newLine();
+            bufferedWriter.write("M=D");
+            bufferedWriter.newLine();
         }
 
         // スタックポインタを更新
