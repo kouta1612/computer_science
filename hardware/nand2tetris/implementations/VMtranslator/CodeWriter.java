@@ -110,6 +110,9 @@ public class CodeWriter {
             if (segment.equals("temp")) {
                 codeWrites("@5", "A=A+D", "D=M");
             }
+            if (segment.equals("pointer")) {
+                codeWrites("@3", "A=A+D", "D=M");
+            }
             // Dレジスタ値をスタックに代入
             codeWrites("@SP", "A=M", "M=D");
             // スタックポインタを更新
@@ -117,24 +120,34 @@ public class CodeWriter {
         }
 
         if (commandType.equals("C_POP")) {
+            // スタックポインタを更新
             decrementSP();
-            codeWrites("@" + index, "D=A");
-            if (commandType.equals("local")) {
-                codeWrites("@LCL", "A=M+D", "D=M");
+            // スタックをDレジスタに保存
+            codeWrites("A=M", "D=M");
+            // メモリセグメントのアドレスをAレジスタに格納
+            if (segment.equals("local")) {
+                codeWrites("@LCL", "A=M");
             }
-            if (commandType.equals("argument")) {
-                codeWrites("@ARG", "A=M+D", "D=M");
+            if (segment.equals("argument")) {
+                codeWrites("@ARG", "A=M");
             }
-            if (commandType.equals("this")) {
-                codeWrites("@THIS", "A=M+D", "D=M");
+            if (segment.equals("this")) {
+                codeWrites("@THIS", "A=M");
             }
-            if (commandType.equals("that")) {
-                codeWrites("@THAT", "A=M+D", "D=M");
+            if (segment.equals("that")) {
+                codeWrites("@THAT", "A=M");
             }
-            if (commandType.equals("temp")) {
-                codeWrites("@5", "A=A+D", "D=M");
+            if (segment.equals("temp")) {
+                codeWrites("@5");
             }
-            codeWrites("@SP", "M=D");
+            if (segment.equals("pointer")) {
+                codeWrites("@3");
+            }
+            for (int i = 0; i < index; i++) {
+                codeWrites("A=A+1");
+            }
+            // メモリセグメントにDレジスタの値を格納
+            codeWrites("M=D");
         }
     }
 
