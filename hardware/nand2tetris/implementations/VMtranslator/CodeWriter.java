@@ -9,12 +9,14 @@ import java.util.regex.Pattern;
 public class CodeWriter {
     private static BufferedWriter bufferedWriter;
     private static int labelNumber = 0;
+    private static String fileName;
 
     private static final Pattern NEGA_COMMAND_PATTERN = Pattern.compile("^(neg|not)$");
     private static final Pattern CALC_COMMAND_PATTERN = Pattern.compile("^(add|sub|and|or)$");
     private static final Pattern BOOL_COMMAND_PATTERN = Pattern.compile("^(eq|gt|lt)$");
 
     CodeWriter(File file) throws IOException {
+        fileName = file.getName().replace(".asm", "");
         FileWriter fileWriter = new FileWriter(file);
         bufferedWriter = new BufferedWriter(fileWriter);
     }
@@ -94,7 +96,12 @@ public class CodeWriter {
 
     public void writePushPop(String commandType, String segment, int index) throws IOException {
         if (commandType.equals("C_PUSH")) {
-            codeWrites("@" + index, "D=A");
+            if (segment.equals("static")) {
+                codeWrites("@" + fileName + "." + index, "D=M");
+            } else {
+                codeWrites("@" + index, "D=A");
+            }
+
             if (segment.equals("local")) {
                 codeWrites("@LCL", "A=M+D", "D=M");
             }
@@ -143,9 +150,15 @@ public class CodeWriter {
             if (segment.equals("pointer")) {
                 codeWrites("@3");
             }
-            for (int i = 0; i < index; i++) {
-                codeWrites("A=A+1");
+            if (segment.equals("static")) {
+                codeWrites("@" + fileName + "." + index);
             }
+            if (!segment.equals("static")) {
+                for (int i = 0; i < index; i++) {
+                    codeWrites("A=A+1");
+                }
+            }
+
             // メモリセグメントにDレジスタの値を格納
             codeWrites("M=D");
         }
