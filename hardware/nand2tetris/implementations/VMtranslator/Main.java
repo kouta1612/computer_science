@@ -27,6 +27,9 @@ public class Main {
                 case "C_PUSH":
                     codeWriter.writePushPop("C_PUSH", parser.arg1(), parser.arg2());
                     break;
+                case "C_POP":
+                    codeWriter.writePushPop("C_POP", parser.arg1(), parser.arg2());
+                    break;
                 case "EMPTY":
                     continue;
                 default:

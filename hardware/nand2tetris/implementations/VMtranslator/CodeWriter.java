@@ -94,14 +94,47 @@ public class CodeWriter {
 
     public void writePushPop(String commandType, String segment, int index) throws IOException {
         if (commandType.equals("C_PUSH")) {
-            if (segment.equals("constant")) {
-                // 定数をDレジスタに代入
-                codeWrites("@" + index, "D=A");
-                // Dレジスタ値をスタックに代入
-                codeWrites("@SP", "A=M", "M=D");
-                // スタックポインタを更新
-                incrementSP();
+            codeWrites("@" + index, "D=A");
+            if (segment.equals("local")) {
+                codeWrites("@LCL", "A=M+D", "D=M");
             }
+            if (segment.equals("argument")) {
+                codeWrites("@ARG", "A=M+D", "D=M");
+            }
+            if (segment.equals("this")) {
+                codeWrites("@THIS", "A=M+D", "D=M");
+            }
+            if (segment.equals("that")) {
+                codeWrites("@THAT", "A=M+D", "D=M");
+            }
+            if (segment.equals("temp")) {
+                codeWrites("@5", "A=A+D", "D=M");
+            }
+            // Dレジスタ値をスタックに代入
+            codeWrites("@SP", "A=M", "M=D");
+            // スタックポインタを更新
+            incrementSP();
+        }
+
+        if (commandType.equals("C_POP")) {
+            decrementSP();
+            codeWrites("@" + index, "D=A");
+            if (commandType.equals("local")) {
+                codeWrites("@LCL", "A=M+D", "D=M");
+            }
+            if (commandType.equals("argument")) {
+                codeWrites("@ARG", "A=M+D", "D=M");
+            }
+            if (commandType.equals("this")) {
+                codeWrites("@THIS", "A=M+D", "D=M");
+            }
+            if (commandType.equals("that")) {
+                codeWrites("@THAT", "A=M+D", "D=M");
+            }
+            if (commandType.equals("temp")) {
+                codeWrites("@5", "A=A+D", "D=M");
+            }
+            codeWrites("@SP", "M=D");
         }
     }
 

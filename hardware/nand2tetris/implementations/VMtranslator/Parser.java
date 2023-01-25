@@ -15,9 +15,9 @@ public class Parser {
 
     private static final Pattern ARITHMETIC_PATTERN = Pattern.compile("^(add|sub|neg|eq|gt|lt|and|or|not)$");
     private static final Pattern PUSH_PATTERN = Pattern
-            .compile("push(argument|local|static|constant|this|that|pointer|temp)(\\d+)");
-    // private static final Pattern POP_PATTERN = Pattern
-    // .compile("^pop(argument|local|static|constant|this|that|pointer|temp)(\\d+)");
+            .compile("^push(argument|local|static|constant|this|that|pointer|temp)(\\d+)$");
+    private static final Pattern POP_PATTERN = Pattern
+            .compile("^pop(argument|local|static|constant|this|that|pointer|temp)(\\d+)$");
 
     Parser(File file) throws FileNotFoundException {
         FileReader fileReader = new FileReader(file);
@@ -55,10 +55,10 @@ public class Parser {
             currentCommandType = "C_PUSH";
             return currentCommandType;
         }
-        // if (POP_PATTERN.matcher(currentCommand).matches()) {
-        // currentCommandType = "C_POP";
-        // return currentCommandType;
-        // }
+        if (POP_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_POP";
+            return currentCommandType;
+        }
 
         throw new Exception("予期しないコマンドタイプが設定されています。");
     }
@@ -77,10 +77,14 @@ public class Parser {
                     throw new Exception("PUSHコマンドでパースエラーが発生しました。");
                 }
                 return matcher.group(1);
-            // case "C_POP":
-            // return POP_PATTERN.matcher(currentCommand).group(1);
-            // case "C_RETURN":
-            // throw new IllegalArgumentException("C_RETURN は引数を持ちません。");
+            case "C_POP":
+                matcher = POP_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("POPコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
+            case "C_RETURN":
+                throw new IllegalArgumentException("C_RETURN は引数を持ちません。");
             default:
                 throw new Exception("予期しない引数です。");
         }
@@ -94,8 +98,12 @@ public class Parser {
                     throw new Exception("PUSHコマンドでパースエラーが発生しました。");
                 }
                 return Integer.valueOf(matcher.group(2));
-            // case "C_POP":
-            // return Integer.valueOf(PUSH_PATTERN.matcher(currentCommand).group(2), 0);
+            case "C_POP":
+                matcher = POP_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("POPコマンドでパースエラーが発生しました。");
+                }
+                return Integer.valueOf(matcher.group(2));
             default:
                 throw new Exception("引数を持たないか予期しないコマンドです。");
         }
