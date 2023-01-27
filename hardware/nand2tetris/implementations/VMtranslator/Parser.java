@@ -15,9 +15,21 @@ public class Parser {
 
     private static final Pattern ARITHMETIC_PATTERN = Pattern.compile("^(add|sub|neg|eq|gt|lt|and|or|not)$");
     private static final Pattern PUSH_PATTERN = Pattern
-            .compile("^push(argument|local|static|constant|this|that|pointer|temp)(\\d+)$");
+            .compile("^push(?:\\s*)(argument|local|static|constant|this|that|pointer|temp)(?:\\s*)(\\d+)$");
     private static final Pattern POP_PATTERN = Pattern
-            .compile("^pop(argument|local|static|constant|this|that|pointer|temp)(\\d+)$");
+            .compile("^pop(?:\\s*)(argument|local|static|constant|this|that|pointer|temp)(?:\\s*)(\\d+)$");
+    private static final Pattern LABEL_PATTERN = Pattern
+            .compile("^label(?:\\s*)(^[^\\d][a-zA-Z\\d_.:]*)$");
+    private static final Pattern GOTO_PATTERN = Pattern
+            .compile("^goto(?:\\s*)(^[^\\d][a-zA-Z\\d_.:]*)$");
+    private static final Pattern IF_PATTERN = Pattern
+            .compile("^if-goto(?:\\s*)(^[^\\d][a-zA-Z\\d_.:]*)$");
+    private static final Pattern FUNCTION_PATTERN = Pattern
+            .compile("^function(?:\\s*)([^\\d][a-zA-Z\\d_.:]*)(?:\\s*)(\\d+)$");
+    private static final Pattern CALL_PATTERN = Pattern
+            .compile("^call(?:\\s*)([^\\d][a-zA-Z\\d_.:]*)(?:\\s*)(\\d+)$");
+    private static final Pattern RETURN_PATTERN = Pattern
+            .compile("^(return)$");
 
     Parser(File file) throws FileNotFoundException {
         FileReader fileReader = new FileReader(file);
@@ -32,7 +44,7 @@ public class Parser {
                 return false;
             }
 
-            currentCommand = currentCommand.replaceAll(" ", "");
+            currentCommand = currentCommand.trim();
             currentCommand = currentCommand.replaceAll("//.*$", "");
 
             return true;
@@ -59,6 +71,30 @@ public class Parser {
             currentCommandType = "C_POP";
             return currentCommandType;
         }
+        if (LABEL_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_LABEL";
+            return currentCommandType;
+        }
+        if (GOTO_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_GOTO";
+            return currentCommandType;
+        }
+        if (IF_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_IF";
+            return currentCommandType;
+        }
+        if (FUNCTION_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_FUNCTION";
+            return currentCommandType;
+        }
+        if (CALL_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_CALL";
+            return currentCommandType;
+        }
+        if (RETURN_PATTERN.matcher(currentCommand).matches()) {
+            currentCommandType = "C_RETURN";
+            return currentCommandType;
+        }
 
         throw new Exception("予期しないコマンドタイプが設定されています。");
     }
@@ -83,6 +119,36 @@ public class Parser {
                     throw new Exception("POPコマンドでパースエラーが発生しました。");
                 }
                 return matcher.group(1);
+            case "C_LABEL":
+                matcher = LABEL_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("LABELコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
+            case "C_GOTO":
+                matcher = GOTO_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("GOTOコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
+            case "C_IF":
+                matcher = IF_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("IFコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
+            case "C_FUNCTION":
+                matcher = FUNCTION_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("FUNCTIONコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
+            case "C_CALL":
+                matcher = CALL_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("CALLコマンドでパースエラーが発生しました。");
+                }
+                return matcher.group(1);
             case "C_RETURN":
                 throw new IllegalArgumentException("C_RETURN は引数を持ちません。");
             default:
@@ -102,6 +168,18 @@ public class Parser {
                 matcher = POP_PATTERN.matcher(currentCommand);
                 if (!matcher.matches()) {
                     throw new Exception("POPコマンドでパースエラーが発生しました。");
+                }
+                return Integer.valueOf(matcher.group(2));
+            case "C_FUNCTION":
+                matcher = FUNCTION_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("FUNCTIONコマンドでパースエラーが発生しました。");
+                }
+                return Integer.valueOf(matcher.group(2));
+            case "C_CALL":
+                matcher = CALL_PATTERN.matcher(currentCommand);
+                if (!matcher.matches()) {
+                    throw new Exception("CALLコマンドでパースエラーが発生しました。");
                 }
                 return Integer.valueOf(matcher.group(2));
             default:
