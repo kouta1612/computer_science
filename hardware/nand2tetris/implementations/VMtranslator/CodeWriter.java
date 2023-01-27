@@ -168,6 +168,10 @@ public class CodeWriter {
         codeWrites("(" + label + ")");
     }
 
+    public void writeGoto(String label) throws IOException {
+        codeWrites("@" + label, "0;JMP");
+    }
+
     public void writeIf(String label) throws IOException {
         decrementSP();
         codeWrites("@SP", "A=M", "D=M");

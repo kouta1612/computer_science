@@ -36,6 +36,9 @@ public class Main {
                 case "C_IF":
                     codeWriter.writeIf(parser.arg1());
                     break;
+                case "C_GOTO":
+                    codeWriter.writeGoto(parser.arg1());
+                    break;
                 case "EMPTY":
                     continue;
                 default:
