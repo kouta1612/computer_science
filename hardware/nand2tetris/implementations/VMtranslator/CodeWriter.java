@@ -164,6 +164,16 @@ public class CodeWriter {
         }
     }
 
+    public void writeLabel(String label) throws IOException {
+        codeWrites("(" + label + ")");
+    }
+
+    public void writeIf(String label) throws IOException {
+        decrementSP();
+        codeWrites("@SP", "A=M", "D=M");
+        codeWrites("@" + label, "D;JNE");
+    }
+
     public void close() throws IOException {
         bufferedWriter.close();
     }

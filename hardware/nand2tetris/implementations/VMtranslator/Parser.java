@@ -19,11 +19,11 @@ public class Parser {
     private static final Pattern POP_PATTERN = Pattern
             .compile("^pop(?:\\s*)(argument|local|static|constant|this|that|pointer|temp)(?:\\s*)(\\d+)$");
     private static final Pattern LABEL_PATTERN = Pattern
-            .compile("^label(?:\\s*)(^[^\\d][a-zA-Z\\d_.:]*)$");
+            .compile("^label(?:\\s*)([^\\d][a-zA-Z\\d_.:]*)$");
     private static final Pattern GOTO_PATTERN = Pattern
-            .compile("^goto(?:\\s*)(^[^\\d][a-zA-Z\\d_.:]*)$");
+            .compile("^goto(?:\\s*)([^\\d][a-zA-Z\\d_.:]*)$");
     private static final Pattern IF_PATTERN = Pattern
-            .compile("^if-goto(?:\\s*)(^[^\\d][a-zA-Z\\d_.:]*)$");
+            .compile("^if-goto(?:\\s*)([^\\d][a-zA-Z\\d_.:]*)$");
     private static final Pattern FUNCTION_PATTERN = Pattern
             .compile("^function(?:\\s*)([^\\d][a-zA-Z\\d_.:]*)(?:\\s*)(\\d+)$");
     private static final Pattern CALL_PATTERN = Pattern
@@ -44,8 +44,8 @@ public class Parser {
                 return false;
             }
 
-            currentCommand = currentCommand.trim();
             currentCommand = currentCommand.replaceAll("//.*$", "");
+            currentCommand = currentCommand.trim();
 
             return true;
         } catch (Exception e) {

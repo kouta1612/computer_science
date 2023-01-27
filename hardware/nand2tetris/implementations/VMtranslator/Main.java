@@ -30,6 +30,12 @@ public class Main {
                 case "C_POP":
                     codeWriter.writePushPop("C_POP", parser.arg1(), parser.arg2());
                     break;
+                case "C_LABEL":
+                    codeWriter.writeLabel(parser.arg1());
+                    break;
+                case "C_IF":
+                    codeWriter.writeIf(parser.arg1());
+                    break;
                 case "EMPTY":
                     continue;
                 default:
