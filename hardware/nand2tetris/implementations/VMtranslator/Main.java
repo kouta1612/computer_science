@@ -39,6 +39,12 @@ public class Main {
                 case "C_GOTO":
                     codeWriter.writeGoto(parser.arg1());
                     break;
+                case "C_FUNCTION":
+                    codeWriter.writeFunction(parser.arg1(), parser.arg2());
+                    break;
+                case "C_RETURN":
+                    codeWriter.writeReturn();
+                    break;
                 case "EMPTY":
                     continue;
                 default:
