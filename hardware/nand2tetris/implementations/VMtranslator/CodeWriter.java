@@ -181,30 +181,29 @@ public class CodeWriter {
     public void writeFunction(String functionName, int numLocals) throws IOException {
         codeWrites("(" + functionName + ")");
         for (int i = 0; i < numLocals; i++) {
-            codeWrites("@SP", "A=M", "M=0");
-            incrementSP();
+            writePushPop("C_PUSH", "local", i);
         }
     }
 
     public void writeReturn() throws IOException {
         // FRAME = LCL
-        codeWrites("@LCL", "D=M", "@FLAME", "M=D");
+        codeWrites("@LCL", "D=M", "@FRAME", "M=D");
         // RET = *(FRAME - 5)
-        codeWrites("@5", "D=A", "@FLAME", "A=A-D", "D=M", "@RET", "M=D");
+        codeWrites("@5", "D=A", "@FRAME", "A=M-D", "D=M", "@RET", "M=D");
         // *ARG = pop()
-        codeWrites("@SP", "A=M-1", "D=M", "@ARG", "M=D");
+        codeWrites("@SP", "M=M-1", "A=M", "D=M", "@ARG", "A=M", "M=D");
         // SP = ARG + 1
-        codeWrites("@ARG", "D=A+1", "@SP", "M=D");
+        codeWrites("@ARG", "A=M+1", "D=A", "@SP", "M=D");
         // THAT = *(FRAME - 1)
-        codeWrites("@FRAME", "A=A-1", "D=M", "@THAT", "M=D");
+        codeWrites("@FRAME", "A=M-1", "D=M", "@THAT", "M=D");
         // THIS = *(FRAME - 2)
-        codeWrites("@2", "D=A", "@FRAME", "A=A-D", "D=M", "@THIS", "M=D");
+        codeWrites("@2", "D=A", "@FRAME", "A=M-D", "D=M", "@THIS", "M=D");
         // ARG = *(FRAME - 3)
-        codeWrites("@3", "D=A", "@FRAME", "A=A-D", "D=M", "@ARG", "M=D");
+        codeWrites("@3", "D=A", "@FRAME", "A=M-D", "D=M", "@ARG", "M=D");
         // LCL = *(FRAME - 4)
-        codeWrites("@4", "D=A", "@FRAME", "A=A-D", "D=M", "@LCL", "M=D");
+        codeWrites("@4", "D=A", "@FRAME", "A=M-D", "D=M", "@LCL", "M=D");
         // goto RET
-        codeWrites("@RET", "0;JMP");
+        codeWrites("@RET", "A=M", "0;JMP");
     }
 
     public void close() throws IOException {
