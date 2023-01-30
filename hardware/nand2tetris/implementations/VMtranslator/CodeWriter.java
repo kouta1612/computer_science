@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 public class CodeWriter {
     private static BufferedWriter bufferedWriter;
     private static int labelNumber = 0;
+    private static int returnLabelNumber = 0;
     private static String fileName;
 
     private static final Pattern NEGA_COMMAND_PATTERN = Pattern.compile("^(neg|not)$");
@@ -19,6 +20,13 @@ public class CodeWriter {
         fileName = file.getName().replace(".asm", "");
         FileWriter fileWriter = new FileWriter(file);
         bufferedWriter = new BufferedWriter(fileWriter);
+    }
+
+    public void writeInit() throws Exception {
+        // SP = 256
+        codeWrites("@256", "D=A", "@SP", "M=D");
+        // call Sys.init
+        writeCall("Sys.init", 0);
     }
 
     public void writeArithmetic(String command) throws IOException {
@@ -178,6 +186,34 @@ public class CodeWriter {
         codeWrites("@" + label, "D;JNE");
     }
 
+    public void writeCall(String functionName, int numArgs) throws IOException {
+        // push return-address
+        String returnLabel = getReturnLabel();
+        codeWrites("@" + returnLabel, "D=A", "@SP", "A=M", "M=D");
+        incrementSP();
+        // push LCL
+        codeWrites("@LCL", "D=M", "@SP", "A=M", "M=D");
+        incrementSP();
+        // push ARG
+        codeWrites("@ARG", "D=M", "@SP", "A=M", "M=D");
+        incrementSP();
+        // push THIS
+        codeWrites("@THIS", "D=M", "@SP", "A=M", "M=D");
+        incrementSP();
+        // push THAT
+        codeWrites("@THAT", "D=M", "@SP", "A=M", "M=D");
+        incrementSP();
+        // ARG = SP - n - 5
+        codeWrites("@SP", "D=M", "@" + numArgs, "D=D-A", "@5", "D=D-A");
+        codeWrites("@ARG", "M=D");
+        // LCL = SP
+        codeWrites("@SP", "D=M", "@LCL", "M=D");
+        // goto f
+        codeWrites("@" + functionName, "0;JMP");
+        // (return-address)
+        codeWrites("(" + returnLabel + ")");
+    }
+
     public void writeFunction(String functionName, int numLocals) throws IOException {
         codeWrites("(" + functionName + ")");
         for (int i = 0; i < numLocals; i++) {
@@ -230,5 +266,12 @@ public class CodeWriter {
         labelNumber++;
 
         return labelName;
+    }
+
+    private String getReturnLabel() throws IOException {
+        String returnLabelName = "return-address" + returnLabelNumber;
+        returnLabelNumber++;
+
+        return returnLabelName;
     }
 }

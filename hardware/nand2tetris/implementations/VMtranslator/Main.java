@@ -1,24 +1,57 @@
 package implementations.VMtranslator;
 
 import java.io.File;
-import java.util.regex.Pattern;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
 public class Main {
-    private static final Pattern VM_FILENAME_PATTERN = Pattern.compile(".+(\\.vm)$");
+    private static CodeWriter codeWriter;
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             throw new IllegalArgumentException("引数にファイル名が指定されていません。");
         }
-        if (!VM_FILENAME_PATTERN.matcher(args[0]).matches()) {
-            throw new IllegalArgumentException("VMファイルではありません。");
+
+        File input = new File(args[0]);
+        if (!input.exists()) {
+            throw new IOException("指定したファイルまたはディレクトリが見つかりませんでした。");
         }
 
-        File inFile = new File(args[0]);
-        Parser parser = new Parser(inFile);
+        if (input.isFile() && !input.getPath().endsWith(".vm")) {
+            throw new IllegalAccessError("VMファイルを指定してください。");
+        }
 
-        File outFile = new File(args[0].replace(".vm", ".asm"));
-        CodeWriter codeWriter = new CodeWriter(outFile);
+        String filename = getFileName(input);
+        File asmFile = new File(filename);
+        codeWriter = new CodeWriter(asmFile);
+
+        if (input.isFile()) {
+            Parser parser = new Parser(input);
+            writeCodesToAsmFile(parser);
+        }
+
+        if (input.isDirectory()) {
+            codeWriter.writeInit();
+            FilenameFilter vmFileFilter = new vmFileFilter();
+            File[] vmFiles = input.listFiles(vmFileFilter);
+            for (File vmFile : vmFiles) {
+                Parser parser = new Parser(vmFile);
+                writeCodesToAsmFile(parser);
+            }
+        }
+
+        codeWriter.close();
+    }
+
+    private static String getFileName(File input) {
+        if (input.isFile()) {
+            return input.getPath().replace(".vm", ".asm");
+        }
+
+        return input.getPath() + "/" + input.getName() + ".asm";
+    }
+
+    private static void writeCodesToAsmFile(Parser parser) throws IOException, Exception {
         while (parser.advance()) {
             switch (parser.commandType()) {
                 case "C_ARITHMETIC":
@@ -42,6 +75,9 @@ public class Main {
                 case "C_FUNCTION":
                     codeWriter.writeFunction(parser.arg1(), parser.arg2());
                     break;
+                case "C_CALL":
+                    codeWriter.writeCall(parser.arg1(), parser.arg2());
+                    break;
                 case "C_RETURN":
                     codeWriter.writeReturn();
                     break;
@@ -51,7 +87,15 @@ public class Main {
                     throw new Exception("予期しないコマンドタイプでした。");
             }
         }
+    }
+}
 
-        codeWriter.close();
+class vmFileFilter implements FilenameFilter {
+    public boolean accept(File dir, String name) {
+        if (name.endsWith(".vm")) {
+            return true;
+        }
+
+        return false;
     }
 }
