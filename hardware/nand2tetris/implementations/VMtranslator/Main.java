@@ -5,29 +5,21 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 public class Main {
+    private static File input;
+    private static Parser parser;
     private static CodeWriter codeWriter;
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
-            throw new IllegalArgumentException("引数にファイル名が指定されていません。");
+            throw new IllegalArgumentException("引数にファイルまたはディレクトリのパスが指定されていません。");
         }
 
-        File input = new File(args[0]);
-        if (!input.exists()) {
-            throw new IOException("指定したファイルまたはディレクトリが見つかりませんでした。");
-        }
-
-        if (input.isFile() && !input.getPath().endsWith(".vm")) {
-            throw new IllegalAccessError("VMファイルを指定してください。");
-        }
-
-        String filename = getFileName(input);
-        File asmFile = new File(filename);
-        codeWriter = new CodeWriter(asmFile);
+        input = new File(args[0]);
+        codeWriter = new CodeWriter(input);
 
         if (input.isFile()) {
-            Parser parser = new Parser(input);
-            writeCodesToAsmFile(parser);
+            parser = new Parser(input);
+            writeCodesToAsmFile();
         }
 
         if (input.isDirectory()) {
@@ -35,23 +27,16 @@ public class Main {
             FilenameFilter vmFileFilter = new vmFileFilter();
             File[] vmFiles = input.listFiles(vmFileFilter);
             for (File vmFile : vmFiles) {
-                Parser parser = new Parser(vmFile);
-                writeCodesToAsmFile(parser);
+                parser = new Parser(vmFile);
+                writeCodesToAsmFile();
             }
         }
 
         codeWriter.close();
     }
 
-    private static String getFileName(File input) {
-        if (input.isFile()) {
-            return input.getPath().replace(".vm", ".asm");
-        }
-
-        return input.getPath() + "/" + input.getName() + ".asm";
-    }
-
-    private static void writeCodesToAsmFile(Parser parser) throws IOException, Exception {
+    private static void writeCodesToAsmFile() throws IOException, Exception {
+        codeWriter.setFileName(input.getName());
         while (parser.advance()) {
             switch (parser.commandType()) {
                 case "C_ARITHMETIC":

@@ -31,8 +31,12 @@ public class Parser {
     private static final Pattern RETURN_PATTERN = Pattern
             .compile("^(return)$");
 
-    Parser(File file) throws FileNotFoundException {
-        FileReader fileReader = new FileReader(file);
+    Parser(File inFile) throws FileNotFoundException {
+        if (!inFile.exists()) {
+            throw new FileNotFoundException("指定したファイルまたはディレクトリが見つかりませんでした。");
+        }
+
+        FileReader fileReader = new FileReader(inFile);
         bufferedReader = new BufferedReader(fileReader);
     }
 

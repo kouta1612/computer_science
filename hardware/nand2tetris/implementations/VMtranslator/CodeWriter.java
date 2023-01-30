@@ -2,6 +2,7 @@ package implementations.VMtranslator;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -10,16 +11,24 @@ public class CodeWriter {
     private static BufferedWriter bufferedWriter;
     private static int labelNumber = 0;
     private static int returnLabelNumber = 0;
-    private static String fileName;
+    private static String vmFileName;
     private static String currentFunctionName;
 
     private static final Pattern NEGA_COMMAND_PATTERN = Pattern.compile("^(neg|not)$");
     private static final Pattern CALC_COMMAND_PATTERN = Pattern.compile("^(add|sub|and|or)$");
     private static final Pattern BOOL_COMMAND_PATTERN = Pattern.compile("^(eq|gt|lt)$");
 
-    CodeWriter(File file) throws IOException {
-        fileName = file.getName().replace(".asm", "");
-        FileWriter fileWriter = new FileWriter(file);
+    CodeWriter(File inFile) throws Exception {
+        if (!inFile.exists()) {
+            throw new FileNotFoundException("指定したファイルまたはディレクトリが見つかりませんでした。");
+        }
+        if (inFile.isFile() && !inFile.getPath().endsWith(".vm")) {
+            throw new IllegalAccessError("VMファイルを指定してください。");
+        }
+
+        String outFileName = getOutFileName(inFile);
+        File outFile = new File(outFileName);
+        FileWriter fileWriter = new FileWriter(outFile);
         bufferedWriter = new BufferedWriter(fileWriter);
     }
 
@@ -28,6 +37,10 @@ public class CodeWriter {
         codeWrites("@256", "D=A", "@SP", "M=D");
         // call Sys.init
         writeCall("Sys.init", 0);
+    }
+
+    public void setFileName(String filename) {
+        vmFileName = filename;
     }
 
     public void writeArithmetic(String command) throws IOException {
@@ -106,7 +119,7 @@ public class CodeWriter {
     public void writePushPop(String commandType, String segment, int index) throws IOException {
         if (commandType.equals("C_PUSH")) {
             if (segment.equals("static")) {
-                codeWrites("@" + fileName + "." + index, "D=M");
+                codeWrites("@" + vmFileName + "." + index, "D=M");
             } else {
                 codeWrites("@" + index, "D=A");
             }
@@ -160,7 +173,7 @@ public class CodeWriter {
                 codeWrites("@3");
             }
             if (segment.equals("static")) {
-                codeWrites("@" + fileName + "." + index);
+                codeWrites("@" + vmFileName + "." + index);
             }
             if (!segment.equals("static")) {
                 for (int i = 0; i < index; i++) {
@@ -287,5 +300,13 @@ public class CodeWriter {
         returnLabelNumber++;
 
         return returnLabelName;
+    }
+
+    private String getOutFileName(File inFile) {
+        if (inFile.isFile()) {
+            return inFile.getPath().replace(".vm", ".asm");
+        }
+
+        return inFile.getPath() + "/" + inFile.getName() + ".asm";
     }
 }
