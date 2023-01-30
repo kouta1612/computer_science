@@ -19,6 +19,7 @@ public class Main {
 
         if (input.isFile()) {
             parser = new Parser(input);
+            codeWriter.setFileName(input.getName());
             writeCodesToAsmFile();
         }
 
@@ -28,6 +29,7 @@ public class Main {
             File[] vmFiles = input.listFiles(vmFileFilter);
             for (File vmFile : vmFiles) {
                 parser = new Parser(vmFile);
+                codeWriter.setFileName(vmFile.getName());
                 writeCodesToAsmFile();
             }
         }
@@ -36,7 +38,6 @@ public class Main {
     }
 
     private static void writeCodesToAsmFile() throws IOException, Exception {
-        codeWriter.setFileName(input.getName());
         while (parser.advance()) {
             switch (parser.commandType()) {
                 case "C_ARITHMETIC":
