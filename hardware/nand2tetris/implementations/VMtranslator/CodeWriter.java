@@ -11,6 +11,7 @@ public class CodeWriter {
     private static int labelNumber = 0;
     private static int returnLabelNumber = 0;
     private static String fileName;
+    private static String currentFunctionName;
 
     private static final Pattern NEGA_COMMAND_PATTERN = Pattern.compile("^(neg|not)$");
     private static final Pattern CALC_COMMAND_PATTERN = Pattern.compile("^(add|sub|and|or)$");
@@ -173,20 +174,33 @@ public class CodeWriter {
     }
 
     public void writeLabel(String label) throws IOException {
-        codeWrites("(" + label + ")");
+        if (currentFunctionName == null) {
+            codeWrites("(" + label + ")");
+        } else {
+            codeWrites("(" + currentFunctionName + "$" + label + ")");
+        }
     }
 
     public void writeGoto(String label) throws IOException {
-        codeWrites("@" + label, "0;JMP");
+        if (currentFunctionName == null) {
+            codeWrites("@" + label, "0;JMP");
+        } else {
+            codeWrites("@" + currentFunctionName + "$" + label, "0;JMP");
+        }
     }
 
     public void writeIf(String label) throws IOException {
         decrementSP();
         codeWrites("@SP", "A=M", "D=M");
-        codeWrites("@" + label, "D;JNE");
+        if (currentFunctionName == null) {
+            codeWrites("@" + label, "D;JNE");
+        } else {
+            codeWrites("@" + currentFunctionName + "$" + label, "D;JNE");
+        }
     }
 
     public void writeCall(String functionName, int numArgs) throws IOException {
+        currentFunctionName = functionName;
         // push return-address
         String returnLabel = getReturnLabel();
         codeWrites("@" + returnLabel, "D=A", "@SP", "A=M", "M=D");
