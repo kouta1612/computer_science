@@ -244,7 +244,7 @@ public class CodeWriter {
     public void writeFunction(String functionName, int numLocals) throws IOException {
         codeWrites("(" + functionName + ")");
         for (int i = 0; i < numLocals; i++) {
-            writePushPop("C_PUSH", "local", i);
+            writePushPop("C_PUSH", "constant", 0);
         }
     }
 
