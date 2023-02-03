@@ -25,7 +25,7 @@ public class Main {
 
         if (input.isDirectory()) {
             codeWriter.writeInit();
-            FilenameFilter vmFileFilter = new vmFileFilter();
+            FilenameFilter vmFileFilter = new VmFileFilter();
             File[] vmFiles = input.listFiles(vmFileFilter);
             for (File vmFile : vmFiles) {
                 parser = new Parser(vmFile);
@@ -73,15 +73,5 @@ public class Main {
                     throw new Exception("予期しないコマンドタイプでした。");
             }
         }
-    }
-}
-
-class vmFileFilter implements FilenameFilter {
-    public boolean accept(File dir, String name) {
-        if (name.endsWith(".vm")) {
-            return true;
-        }
-
-        return false;
     }
 }
