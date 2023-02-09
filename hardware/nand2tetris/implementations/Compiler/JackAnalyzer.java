@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-public class Main {
+public class JackAnalyzer {
     public static void main(String[] args) throws Exception {
         File file = new File(args[0]);
         if (args.length == 0) {
