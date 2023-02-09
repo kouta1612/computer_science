@@ -1,8 +1,13 @@
 package implementations.Compiler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,25 +20,36 @@ public class JackTokenizer {
     private static final String STRING_PATTERN = "^\"[^\"\n]*\"$";
     private static final String IDENTIFIER_PATTERN = "^[^\\d][a-zA-z0-9_]*$";
 
-    private static final Map<Character, String> SYMBOL_REPLACE_MAP = new HashMap<>() {
+    private static final Map<String, String> SYMBOL_REPLACE_MAP = new HashMap<>() {
         {
-            put('<', "&lt;");
-            put('>', "&gt;");
-            put('&', "&amp;");
+            put("<", "&lt;");
+            put(">", "&gt;");
+            put("&", "&amp;");
         }
     };
 
-    private static BufferedReader bufferedReader;
-    private static List<String> tokens;
-    private static int tokenIndex = 0;
-    private static String currentToken;
-    private static String currentTokenType;
-    // private static List<String> xmlTokens;
+    private BufferedReader bufferedReader;
+    private BufferedWriter bufferedWriter;
+    private List<String> tokens = new ArrayList<>();
+    private int tokenIndex = 0;
+    private int intVal;
+    private String tokenType, keyword, symbol, identifier, stringVal;
 
     JackTokenizer(File file) throws Exception {
+        if (!file.exists()) {
+            throw new FileNotFoundException("指定したファイルまたはディレクトリが見つかりませんでした。");
+        }
+        if (file.isFile() && !file.getPath().endsWith(".jack")) {
+            throw new IllegalAccessError("jackファイルを指定してください。");
+        }
+
         FileReader fileReader = new FileReader(file);
         bufferedReader = new BufferedReader(fileReader);
+
         addTokens();
+
+        String outFilePath = getOutFilePath(file);
+        generateXmlFile(outFilePath);
     }
 
     public boolean hasMoreTokens() {
@@ -42,51 +58,125 @@ public class JackTokenizer {
 
     public void advance() {
         String token = tokens.get(tokenIndex);
-        if (token.equals(KEYWORD_PATTERN)) {
-            currentToken = "<keyword> " + token + " </keyword>";
-            currentTokenType = "KEYWORD";
-        } else if (token.equals(SYMBOL_PATTERN)) {
-            currentToken = "<symbol> " + token + " </symbol>";
-            currentTokenType = "SYMBOL";
-        } else if (token.equals(IDENTIFIER_PATTERN)) {
-            currentToken = "<identifier> " + token + " </identifier>";
-            currentTokenType = "IDENTIFIER";
-        } else if (token.equals(INT_PATTERN)) {
-            if (!(0 <= Integer.valueOf(token) && Integer.valueOf(token) <= 32767)) {
+        if (token.matches(KEYWORD_PATTERN)) {
+            tokenType = "KEYWORD";
+            keyword = token.toUpperCase();
+        } else if (token.matches(SYMBOL_PATTERN)) {
+            token = SYMBOL_REPLACE_MAP.containsKey(token) ? SYMBOL_REPLACE_MAP.get(token) : token;
+            tokenType = "SYMBOL";
+            symbol = token;
+        } else if (token.matches(IDENTIFIER_PATTERN)) {
+            tokenType = "IDENTIFIER";
+            identifier = token;
+        } else if (token.matches(INT_PATTERN)) {
+            if (!(0 <= Integer.parseInt(token) && Integer.parseInt(token) <= 32767)) {
                 throw new IllegalArgumentException("integerConstantの値は0から32767までの数字です");
             }
-            currentToken = "<integerConstant> " + token + "\n</integerConstant>";
-            currentTokenType = "INT_CONST";
-        } else if (token.equals(STRING_PATTERN)) {
-            if (token.length() > 2) {
-                token = token.substring(1, token.length() - 2);
-            } else {
-                token = "";
-            }
-            currentToken = "<stringConstant> " + token + "\n</stringConstant>";
-            currentTokenType = "STRING_CONST";
+            tokenType = "INT_CONST";
+            intVal = Integer.parseInt(token);
+        } else if (token.matches(STRING_PATTERN)) {
+            token = token.length() > 2 ? token.substring(1, token.length() - 2) : "";
+            tokenType = "STRING_CONST";
+            stringVal = token;
         }
+
+        tokenIndex++;
+    }
+
+    public String tokenType() {
+        return tokenType;
+    }
+
+    public String keyword() {
+        return keyword;
+    }
+
+    public String symbol() {
+        return symbol;
+    }
+
+    public String identifier() {
+        return identifier;
+    }
+
+    public int intVal() {
+        return intVal;
+    }
+
+    public String StringVal() {
+        return stringVal;
+    }
+
+    private void generateXmlFile(String path) throws Exception {
+        File outFile = new File(path);
+        FileWriter fileWriter = new FileWriter(outFile);
+        bufferedWriter = new BufferedWriter(fileWriter);
+        writeCodes("<tokens>");
+        for (String token : tokens) {
+            if (token.matches(KEYWORD_PATTERN)) {
+                writeCodes("<keyword> " + token + " </keyword>");
+            } else if (token.matches(SYMBOL_PATTERN)) {
+                token = SYMBOL_REPLACE_MAP.containsKey(token) ? SYMBOL_REPLACE_MAP.get(token) : token;
+                writeCodes("<symbol> " + token + " </symbol>");
+            } else if (token.matches(IDENTIFIER_PATTERN)) {
+                writeCodes("<identifier> " + token + " </identifier>");
+            } else if (token.matches(INT_PATTERN)) {
+                if (!(0 <= Integer.parseInt(token) && Integer.parseInt(token) <= 32767)) {
+                    throw new IllegalArgumentException("integerConstantの値は0から32767までの数字です");
+                }
+                writeCodes("<integerConstant> " + token + " </integerConstant>");
+            } else if (token.matches(STRING_PATTERN)) {
+                token = token.length() > 2 ? token.substring(1, token.length() - 1) : "";
+                writeCodes("<stringConstant> " + token + " </stringConstant>");
+            } else {
+                bufferedWriter.close();
+                throw new Exception("予期せぬトークンが入力されました");
+            }
+        }
+        writeCodes("</tokens>");
+
+        bufferedWriter.close();
+    }
+
+    private void writeCodes(String... codes) throws IOException {
+        for (String code : codes) {
+            bufferedWriter.write(code);
+            bufferedWriter.newLine();
+        }
+    }
+
+    private String getOutFilePath(File file) {
+        return file.getPath().replace(".jack", "T.xml");
     }
 
     private void addTokens() throws Exception {
         while (bufferedReader.ready()) {
             String readLine = bufferedReader.readLine();
+            // 1行で完結するコメントを事前に削除
             readLine = readLine.replaceAll("//.*$", "");
+            readLine = readLine.replaceAll("/\\*.*\\*/$", "");
             readLine = readLine.replaceAll("/\\*\\*.*\\*/$", "");
             readLine = readLine.trim();
+            // 複数行から構成されるコメントをスキップ
+            if (readLine.matches("/\\*+")) {
+                String commentLine;
+                while (true) {
+                    commentLine = bufferedReader.readLine().trim();
+                    if (commentLine.matches("\\*+/")) {
+                        break;
+                    }
+                }
+                readLine = commentLine.replaceAll("\\*+/", "").trim();
+            }
+            // 空行をスキップ
             if (readLine.equals("")) {
                 continue;
             }
+
             setTokens(readLine);
         }
         bufferedReader.close();
     }
-
-    // private void lexicalAnalyze() throws Exception {
-    // for (String token : tokens) {
-
-    // }
-    // }
 
     private void setTokens(String line) throws Exception {
         char[] cs = line.toCharArray();
