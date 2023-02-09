@@ -43,13 +43,8 @@ public class JackTokenizer {
             throw new IllegalAccessError("jackファイルを指定してください。");
         }
 
-        FileReader fileReader = new FileReader(file);
-        bufferedReader = new BufferedReader(fileReader);
-
-        addTokens();
-
-        String outFilePath = getOutFilePath(file);
-        generateXmlFile(outFilePath);
+        tokenizing(file);
+        generateXmlFile(file);
     }
 
     public boolean hasMoreTokens() {
@@ -75,7 +70,7 @@ public class JackTokenizer {
             tokenType = "INT_CONST";
             intVal = Integer.parseInt(token);
         } else if (token.matches(STRING_PATTERN)) {
-            token = token.length() > 2 ? token.substring(1, token.length() - 2) : "";
+            token = token.length() > 2 ? token.substring(1, token.length() - 1) : "";
             tokenType = "STRING_CONST";
             stringVal = token;
         }
@@ -107,7 +102,8 @@ public class JackTokenizer {
         return stringVal;
     }
 
-    private void generateXmlFile(String path) throws Exception {
+    private void generateXmlFile(File file) throws Exception {
+        String path = getOutFilePath(file);
         File outFile = new File(path);
         FileWriter fileWriter = new FileWriter(outFile);
         bufferedWriter = new BufferedWriter(fileWriter);
@@ -149,7 +145,10 @@ public class JackTokenizer {
         return file.getPath().replace(".jack", "T.xml");
     }
 
-    private void addTokens() throws Exception {
+    private void tokenizing(File file) throws Exception {
+        FileReader fileReader = new FileReader(file);
+        bufferedReader = new BufferedReader(fileReader);
+
         while (bufferedReader.ready()) {
             String readLine = bufferedReader.readLine();
             // 1行で完結するコメントを事前に削除
