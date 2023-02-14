@@ -35,16 +35,16 @@ public class JackTokenizer {
     private int intVal;
     private String tokenType, keyword, symbol, identifier, stringVal;
 
-    JackTokenizer(File file) throws Exception {
-        if (!file.exists()) {
+    JackTokenizer(File jackFile) throws Exception {
+        if (!jackFile.exists()) {
             throw new FileNotFoundException("指定したファイルまたはディレクトリが見つかりませんでした。");
         }
-        if (file.isFile() && !file.getPath().endsWith(".jack")) {
+        if (jackFile.isFile() && !jackFile.getPath().endsWith(".jack")) {
             throw new IllegalAccessError("jackファイルを指定してください。");
         }
 
-        tokenizing(file);
-        generateXmlFile(file);
+        tokenizing(jackFile);
+        generateXmlFile(jackFile);
     }
 
     public boolean hasMoreTokens() {
