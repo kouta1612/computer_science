@@ -19,3 +19,10 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 ```iterm
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
+
+## やったこと
+
+Protocol Buffersのスキーマ定義からクライアントとサーバサイドのスキーマを生成し
+それを満たす実装をクライアントとサーバで行い、gRPC通信をローカル上で試してみた。
+チャプター6の「gRPCクライアントを動かしてみよう」までを一通りやってみたが、ストリームにいくつか種類があるみたいなので
+興味が出てみたら挑戦してみる。
