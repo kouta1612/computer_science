@@ -17,9 +17,10 @@ docker build -t ubuntu .
 ・ubuntu環境を立ち上げる
 
 bind mountしてあげるとローカル作業ディレクトリとDocker環境で同期されるので便利
+コンテナから外れると自動的に削除してくれるようにした（rmオプション）
 
 ```terminal
-docker run -it --volume $(pwd):/app ubuntu
+docker run --rm -it --volume $(pwd):/app ubuntu
 ```
 
 ## 2.1 Linuxを理解するとは
