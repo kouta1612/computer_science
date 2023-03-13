@@ -5,5 +5,3 @@ RUN apt-get update && \
     sysstat -y
 
 WORKDIR /app
-
-COPY . .

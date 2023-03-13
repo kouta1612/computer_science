@@ -23,6 +23,10 @@ bind mountしてあげるとローカル作業ディレクトリとDocker環境�
 docker run --rm -it --volume $(pwd):/app ubuntu
 ```
 
+## ビルドした環境と違う環境で実行ファイルを実行しようとするとエラーになるので注意
+
+例えばdocker内のubuntu上でビルドして生成された実行ファイルをmac上で実行しようとするとformat errorになる
+
 ## 2.1 Linuxを理解するとは
 
 - Linux世界とは
